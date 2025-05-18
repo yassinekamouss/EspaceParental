@@ -4,6 +4,11 @@
 [![Firebase](https://img.shields.io/badge/Firebase-SDK-orange?logo=firebase)](https://firebase.google.com/docs/reference/js)
 [![TypeScript](https://img.shields.io/badge/TypeScript-^4.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 
+![Interface de connexion](src/assets/login_page_image.jpg)
+
+
+## Description
+
 Application mobile développée avec React Native (CLI) et Firebase pour permettre aux parents de suivre les progrès et activités de leurs enfants.
 
 ## Table des Matières
