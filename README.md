@@ -4,8 +4,11 @@
 [![Firebase](https://img.shields.io/badge/Firebase-SDK-orange?logo=firebase)](https://firebase.google.com/docs/reference/js)
 [![TypeScript](https://img.shields.io/badge/TypeScript-^4.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 
-![Interface de connexion](src/assets/login_page_image.jpg)
 
+<div style="display: flex; gap: 20px;">
+  <img src="src/assets/login_page_image.jpg" alt="Interface de connexion" width="300" />
+  <img src="src/assets/home_page_image.jpg" alt="Interface d'accueil" width="300" />
+</div>
 
 ## Description
 
