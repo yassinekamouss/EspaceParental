@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   ScrollView,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
@@ -103,6 +104,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.mainContainer}>
       {/* Header avec bouton de déconnexion */}
+      <StatusBar backgroundColor="#3464A3" barStyle="light-content" />
       <View style={styles.topHeader}>
         <View style={styles.headerContent}>
           <Text style={styles.appTitle}>MathéMagique</Text>
