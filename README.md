@@ -5,10 +5,9 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-^4.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 
 
-<div style="display: flex;justify-content: center ; gap: 10rem;">
-  <img src="src/assets/login_page_image.jpg" alt="Interface de connexion" width="300"
-  style="border-raduis: 20px;" />
-  <img src="src/assets/home_page_image.jpg" alt="Interface d'accueil" width="300" />
+<div align="center">
+  <img src="src/assets/login_page_image.jpg" alt="Interface de connexion" width="300" style="border-radius: 20px; margin-right: 20px;" />
+  <img src="src/assets/home_page_image.jpg" alt="Interface d'accueil" width="300" style="border-radius: 20px;" />
 </div>
 
 ## Description
