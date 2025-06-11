@@ -1,8 +1,8 @@
-import { User} from './user';
-import { Student } from './student';
+import { User } from './user';
+import { UserRole } from './userRole';
 
 export interface Parent extends User {
 
-    children: Student[];
-    role: 'parent';
+    children: string[];
+    role: UserRole.PARENT;
 }

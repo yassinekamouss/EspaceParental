@@ -1,32 +1,26 @@
+import { UserRole } from './userRole';
 import { User } from './user';
+import { GradeLevel } from './grade-level';
+import { PlayerProfile } from './player-profil';
+import { GameProgress } from './game-progress';
 
 export interface Student extends User {
 
-    grade: string;
-    role: string;
+    grade: GradeLevel;
+    role: UserRole.STUDENT;
     parentId: string;
     teacherId: string;
-    gender: string
-    playerProfile: {
-        playerName: string; // to be used in the game
-        gameLevel: number;
-        mathLevel: number;
-        coins: number;
-        questionsSolved: number;
-        rewardProfile: {
-            score: number;
-            rank: number;
-            iScore: number;
-            rewardCount: number;
-            positives: number;
-            negatives: number;
-        };
-    };
+    historyMathLevel?:
+        {
+            date: string;
+            level: number;
+        }[];
+    playerProfile: PlayerProfile;
     achievements: string[];
-    gameProgress:  {
-        gameId: string;
-        lastScore: number;
-        bestScore: number;
-        completedAt: string;
-    }[];
+     gameProgress: {
+    vertical_operations?: GameProgress;
+    find_compositions?: GameProgress;
+    choose_answer?: GameProgress;
+  };
+
 }

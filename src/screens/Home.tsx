@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
+  Modal,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
@@ -20,6 +21,8 @@ export default function HomeScreen() {
   const [userData, setUserData] = useState<User | Parent | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [children, setChildren] = useState<Student[]>([]);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [selectedChild, setSelectedChild] = useState<Student | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -101,6 +104,16 @@ export default function HomeScreen() {
     );
   }
 
+  const openChildModal = (child: Student) => {
+    setSelectedChild(child);
+    setModalVisible(true);
+  };
+
+  const closeChildModal = () => {
+    setModalVisible(false);
+    setSelectedChild(null);
+  };
+
   return (
     <View style={styles.mainContainer}>
       {/* Header avec bouton de déconnexion */}
@@ -122,9 +135,7 @@ export default function HomeScreen() {
           <Text style={styles.welcome}>
             Bienvenue {userData?.firstName} {userData?.lastName}
           </Text>
-          <Text style={styles.role}>
-            {'Parent'}
-          </Text>
+          <Text style={styles.role}>{'Parent'}</Text>
         </View>
 
         <View style={styles.card}>
@@ -164,12 +175,13 @@ export default function HomeScreen() {
             </View>
 
             {children.length > 0 ? (
-              children.map((child) => (
+              children.map(child => (
                 <TouchableOpacity
                   key={child.id}
                   style={styles.childCard}
                   onPress={() => {
                     /* Navigation vers le détail de l'enfant */
+                    openChildModal(child);
                   }}>
                   <View style={styles.childHeader}>
                     <Icon
@@ -199,7 +211,11 @@ export default function HomeScreen() {
                       <View
                         style={[
                           styles.progressFill,
-                          {width: `${(child.playerProfile?.mathLevel || 0) * 10}%`},
+                          {
+                            width: `${
+                              (child.playerProfile?.mathLevel || 0) * 10
+                            }%`,
+                          },
                         ]}
                       />
                     </View>
@@ -208,15 +224,14 @@ export default function HomeScreen() {
                       <View style={styles.statItem}>
                         <Icon name="star" size={18} color="#FFD700" />
                         <Text style={styles.statText}>
-                          {child.playerProfile?.coins || 0} pièces
+                          {child.playerProfile?.score || 0} pièces
                         </Text>
                       </View>
 
                       <View style={styles.statItem}>
                         <Icon name="check-circle" size={18} color="#27AE60" />
                         <Text style={styles.statText}>
-                          {child.playerProfile?.questionsSolved || 0} problèmes
-                          résolus
+                          {child.playerProfile?.score * 2 || 0} problèmes résolus
                         </Text>
                       </View>
                     </View>
@@ -226,7 +241,9 @@ export default function HomeScreen() {
             ) : (
               <View style={styles.noChildrenContainer}>
                 <Icon name="account-child-outline" size={80} color="#CCDDEE" />
-                <Text style={styles.noChildrenTitle}>Aucun enfant enregistré</Text>
+                <Text style={styles.noChildrenTitle}>
+                  Aucun enfant enregistré
+                </Text>
                 <Text style={styles.noChildrenText}>
                   Vous n'avez pas encore d'enfants associés à votre compte.
                 </Text>
@@ -237,17 +254,252 @@ export default function HomeScreen() {
                   </TouchableOpacity>
                 </View>
                 <View style={styles.noChildrenIllustration}>
-                  <Icon name="school" size={30} color="#3464A3" style={styles.illustrationIcon} />
-                  <Icon name="math-compass" size={26} color="#FF7043" style={styles.illustrationIcon} />
-                  <Icon name="book-open-page-variant" size={28} color="#4CAF50" style={styles.illustrationIcon} />
-                  <Icon name="palette" size={26} color="#9C27B0" style={styles.illustrationIcon} />
-                  <Icon name="atom" size={28} color="#FF9800" style={styles.illustrationIcon} />
+                  <Icon
+                    name="school"
+                    size={30}
+                    color="#3464A3"
+                    style={styles.illustrationIcon}
+                  />
+                  <Icon
+                    name="math-compass"
+                    size={26}
+                    color="#FF7043"
+                    style={styles.illustrationIcon}
+                  />
+                  <Icon
+                    name="book-open-page-variant"
+                    size={28}
+                    color="#4CAF50"
+                    style={styles.illustrationIcon}
+                  />
+                  <Icon
+                    name="palette"
+                    size={26}
+                    color="#9C27B0"
+                    style={styles.illustrationIcon}
+                  />
+                  <Icon
+                    name="atom"
+                    size={28}
+                    color="#FF9800"
+                    style={styles.illustrationIcon}
+                  />
                 </View>
               </View>
             )}
           </View>
         )}
       </ScrollView>
+
+      {/* Modal pour afficher les détails de l'enfant */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={closeChildModal}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                Progression de {selectedChild?.firstName}{' '}
+                {selectedChild?.lastName}
+              </Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={closeChildModal}>
+                <Icon name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <View style={styles.studentInfoSummary}>
+                <View style={styles.studentAvatar}>
+                  <Icon
+                    name={
+                      selectedChild?.gender === 'male'
+                        ? 'face-man'
+                        : 'face-woman'
+                    }
+                    size={60}
+                    color="#3464A3"
+                  />
+                </View>
+                <View style={styles.studentDetails}>
+                  <Text style={styles.studentName}>
+                    {selectedChild?.firstName} {selectedChild?.lastName}
+                  </Text>
+                  <Text style={styles.studentStat}>
+                    Niveau actuel:{' '}
+                    <Text style={styles.statValue}>
+                      {selectedChild?.playerProfile?.mathLevel || 'Non défini'}
+                    </Text>
+                  </Text>
+                  <Text style={styles.studentStat}>
+                    Score total:{' '}
+                    <Text style={styles.statValue}>
+                      {selectedChild?.playerProfile?.score || 0}
+                    </Text>
+                  </Text>
+                </View>
+              </View>
+
+              {selectedChild?.historyMathLevel &&
+              selectedChild.historyMathLevel.length > 0 ? (
+                <View style={styles.historyContainer}>
+                  <Text style={styles.historyTitle}>
+                    Historique des niveaux
+                  </Text>
+                  <ScrollView style={styles.historyScroll}>
+                    <View style={styles.historyTable}>
+                      <View style={styles.tableHeader}>
+                        <Text style={[styles.tableHeaderCell, {flex: 2}]}>
+                          Date
+                        </Text>
+                        <Text style={[styles.tableHeaderCell, {flex: 1}]}>
+                          Niveau
+                        </Text>
+                      </View>
+                      {selectedChild.historyMathLevel.map((history, index) => (
+                        <View key={index} style={styles.tableRow}>
+                          <Text style={[styles.tableCell, {flex: 2}]}>
+                            {new Date(history.date).toLocaleDateString('fr-FR')}
+                          </Text>
+                          <Text style={[styles.tableCell, {flex: 1}]}>
+                            {history.level}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  </ScrollView>
+                </View>
+              ) : (
+                <View style={styles.noHistoryMessage}>
+                  <Icon name="alert-circle-outline" size={40} color="#CCDDEE" />
+                  <Text style={styles.noHistoryText}>
+                    Aucun historique de progression disponible pour cet élève.
+                  </Text>
+                </View>
+              )}
+
+              <View style={styles.gameProgressContainer}>
+                <Text style={styles.gameProgressTitle}>
+                  Progression dans les jeux
+                </Text>
+
+                {selectedChild?.gameProgress?.vertical_operations && (
+                  <View style={styles.gameProgressItem}>
+                    <Text style={styles.gameProgressName}>
+                      Opérations Verticales
+                    </Text>
+                    <View style={styles.gameProgressBar}>
+                      {/* Calculer un pourcentage basé sur bestScore, avec un maximum supposé de 100 */}
+                      <View
+                        style={[
+                          styles.gameProgressFill,
+                          {
+                            width: `${Math.min(
+                              selectedChild.gameProgress.vertical_operations
+                                .bestScore || 0,
+                              100,
+                            )}%`,
+                          },
+                        ]}
+                      />
+                    </View>
+                    <Text style={styles.gameProgressPercent}>
+                      Score:{' '}
+                      {selectedChild.gameProgress.vertical_operations
+                        .bestScore || 0}
+                    </Text>
+                  </View>
+                )}
+
+                {selectedChild?.gameProgress?.find_compositions && (
+                  <View style={styles.gameProgressItem}>
+                    <Text style={styles.gameProgressName}>
+                      Trouver les Compositions
+                    </Text>
+                    <View style={styles.gameProgressBar}>
+                      <View
+                        style={[
+                          styles.gameProgressFill,
+                          {
+                            width: `${Math.min(
+                              selectedChild.gameProgress.find_compositions
+                                .bestScore || 0,
+                              100,
+                            )}%`,
+                          },
+                        ]}
+                      />
+                    </View>
+                    <Text style={styles.gameProgressPercent}>
+                      Score:{' '}
+                      {selectedChild.gameProgress.find_compositions.bestScore ||
+                        0}
+                    </Text>
+                  </View>
+                )}
+
+                {selectedChild?.gameProgress?.choose_answer && (
+                  <View style={styles.gameProgressItem}>
+                    <Text style={styles.gameProgressName}>
+                      Choisir la Réponse
+                    </Text>
+                    <View style={styles.gameProgressBar}>
+                      <View
+                        style={[
+                          styles.gameProgressFill,
+                          {
+                            width: `${Math.min(
+                              selectedChild.gameProgress.choose_answer
+                                .bestScore || 0,
+                              100,
+                            )}%`,
+                          },
+                        ]}
+                      />
+                    </View>
+                    <Text style={styles.gameProgressPercent}>
+                      Score:{' '}
+                      {selectedChild.gameProgress.choose_answer.bestScore || 0}
+                    </Text>
+                  </View>
+                )}
+
+                {/* Ajouter des informations complémentaires sur les jeux */}
+                <View style={styles.gameStatsSummary}>
+                  <Text style={styles.gameStatsTitle}>Dernières activités</Text>
+                  {selectedChild?.gameProgress?.vertical_operations && (
+                    <Text style={styles.gameCompletedText}>
+                      Opérations Verticales:{' '}
+                      {new Date(
+                        selectedChild.gameProgress.vertical_operations.completedAt,
+                      ).toLocaleDateString('fr-FR')}
+                    </Text>
+                  )}
+                  {selectedChild?.gameProgress?.find_compositions && (
+                    <Text style={styles.gameCompletedText}>
+                      Trouver les Compositions:{' '}
+                      {new Date(
+                        selectedChild.gameProgress.find_compositions.completedAt,
+                      ).toLocaleDateString('fr-FR')}
+                    </Text>
+                  )}
+                  {selectedChild?.gameProgress?.choose_answer && (
+                    <Text style={styles.gameCompletedText}>
+                      Choisir la Réponse:{' '}
+                      {new Date(
+                        selectedChild.gameProgress.choose_answer.completedAt,
+                      ).toLocaleDateString('fr-FR')}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -469,5 +721,192 @@ const styles = StyleSheet.create({
   },
   illustrationIcon: {
     marginHorizontal: 10,
+  },
+  // Styles pour le modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+  },
+  modalContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 15,
+    width: '100%',
+    maxHeight: '80%',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#3464A3',
+    flex: 1,
+  },
+  closeButton: {
+    padding: 5,
+  },
+  modalBody: {
+    padding: 20,
+  },
+  studentInfoSummary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    backgroundColor: '#F8FAFD',
+    padding: 15,
+    borderRadius: 10,
+  },
+  studentAvatar: {
+    backgroundColor: '#EAEFF7',
+    borderRadius: 40,
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  studentDetails: {
+    flex: 1,
+  },
+  studentName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  studentStat: {
+    fontSize: 14,
+    color: '#666',
+    marginVertical: 2,
+  },
+  statValue: {
+    fontWeight: 'bold',
+    color: '#3464A3',
+  },
+  historyContainer: {
+    marginTop: 15,
+    marginBottom: 15,
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#EEE',
+  },
+  historyTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE',
+  },
+  historyScroll: {
+    maxHeight: 200,
+  },
+  historyTable: {
+    width: '100%',
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#F5F7FA',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  tableHeaderCell: {
+    fontWeight: 'bold',
+    color: '#666',
+    fontSize: 14,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  tableCell: {
+    fontSize: 14,
+    color: '#333',
+  },
+  noHistoryMessage: {
+    backgroundColor: '#F8FAFD',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginVertical: 15,
+  },
+  noHistoryText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  gameProgressContainer: {
+    marginTop: 15,
+    backgroundColor: '#F8FAFD',
+    borderRadius: 10,
+    padding: 15,
+  },
+  gameProgressTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+  },
+  gameProgressItem: {
+    marginVertical: 8,
+  },
+  gameProgressName: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+  },
+  gameProgressBar: {
+    height: 8,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    marginVertical: 5,
+    overflow: 'hidden',
+  },
+  gameProgressFill: {
+    height: '100%',
+    backgroundColor: '#4CAF50',
+    borderRadius: 4,
+  },
+  gameProgressPercent: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'right',
+  },
+  gameStatsTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  gameStatsSummary: {
+    backgroundColor: '#EAEFF7',
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 15,
+  },
+  gameCompletedText: {
+    fontSize: 13,
+    color: '#555',
+    marginVertical: 3,
   },
 });
